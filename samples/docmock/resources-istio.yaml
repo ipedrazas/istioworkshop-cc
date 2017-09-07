@@ -1,0 +1,105 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    run: docmock
+  name: docmock
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: docmock
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        alpha.istio.io/sidecar: injected
+        alpha.istio.io/version: jenkins@ubuntu-16-04-build-12ac793f80be71-0.1.6-dab2033
+        pod.beta.kubernetes.io/init-containers: '[{"args":["-p","15001","-u","1337"],"image":"docker.io/istio/init:0.1","imagePullPolicy":"Always","name":"init","securityContext":{"capabilities":{"add":["NET_ADMIN"]}}},{"args":["-c","sysctl
+          -w kernel.core_pattern=/tmp/core.%e.%p.%t \u0026\u0026 ulimit -c unlimited"],"command":["/bin/sh"],"image":"alpine","imagePullPolicy":"Always","name":"enable-core-dump","securityContext":{"privileged":true}}]'
+      creationTimestamp: null
+      labels:
+        run: docmock
+    spec:
+      containers:
+      - env:
+        - name: ENDPOINT
+          value: docmock
+        - name: BJSON
+          value: ewogICJuYW1lIjogIkl2YW4iLAogICJBZ2UiOiA0Mgp9Cg==
+        - name: DEBUG
+          value: "true"
+        image: ipedrazas/docmock
+        name: docmock
+        ports:
+        - containerPort: 5000
+        resources: {}
+      - args:
+        - proxy
+        - sidecar
+        - -v
+        - "2"
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        image: docker.io/istio/proxy_debug:0.1
+        imagePullPolicy: Always
+        name: proxy
+        resources: {}
+        securityContext:
+          runAsUser: 1337
+        volumeMounts:
+        - mountPath: /etc/certs
+          name: istio-certs
+          readOnly: true
+      volumes:
+      - name: istio-certs
+        secret:
+          secretName: istio.default
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: docmock
+  name: docmock
+  namespace: default
+spec:
+  ports:
+  - port: 5000
+    protocol: TCP
+    targetPort: 5000
+    name: http
+  selector:
+    run: docmock
+  sessionAffinity: None
+  type: ClusterIP
+  
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: docmock
+  annotations:
+    kubernetes.io/ingress.class: "istio"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /docmock
+        backend:
+          serviceName: docmock
+          servicePort: 5000
+---

@@ -1,0 +1,12 @@
+type: route-rule
+name: version2
+spec:
+  destination: simple.default.svc.cluster.local
+  match:
+    httpHeaders:
+      simple:
+        exact: very
+  precedence: 2
+  route:
+  - tags:
+      release: x

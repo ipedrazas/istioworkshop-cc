@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  labels:
+    app: nginx
+data:
+  nginx.conf: |
+    upstream http_backend {
+        server 127.0.0.1:8080;
+        keepalive 16;
+    }
+
+
+    server {
+        listen 80 default_server;
+        listen [::]:80 default_server ipv6only=on;
+
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+
+        location /http/ {
+            proxy_pass http://http_backend;
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";   
+        }
+    }
+
+    server {
+        listen 8080 default_server;
+        listen [::]:8080 default_server ipv6only=on;
+
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+
+        location / {
+            index  index.html index.htm;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /usr/share/nginx/html;
+        }
+    }

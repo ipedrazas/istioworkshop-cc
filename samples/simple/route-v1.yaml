@@ -1,0 +1,9 @@
+type: route-rule
+name: version1
+spec:
+  destination: simple.default.svc.cluster.local
+  precedence: 1
+  route:
+  - tags:
+      release: x
+

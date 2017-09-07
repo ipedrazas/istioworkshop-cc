@@ -1,0 +1,62 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: docmock
+  name: docmock
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: docmock
+  template:
+    metadata:
+      labels:
+        run: docmock
+    spec:
+      containers:
+      - image: ipedrazas/docmock
+        name: docmock
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ENDPOINT
+          value: docmock
+        - name: BJSON
+          value: ewogICJuYW1lIjogIkl2YW4iLAogICJBZ2UiOiA0Mgp9Cg==
+        - name: DEBUG
+          value: "true"
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: docmock
+  name: docmock
+  namespace: default
+spec:
+  ports:
+  - port: 5000
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    run: docmock
+  sessionAffinity: None
+  type: ClusterIP
+  
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: docmock
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /docmock
+        backend:
+          serviceName: docmock
+          servicePort: 5000
+---

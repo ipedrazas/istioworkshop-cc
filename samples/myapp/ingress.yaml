@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: myapp
+  annotations:
+    kubernetes.io/ingress.class: "istio"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /v1
+        backend:
+          serviceName: v1-myapp
+          servicePort: 80
+      - path: /v2
+        backend:
+          serviceName: v2-myapp
+          servicePort: 80
+      - path: /web
+        backend:
+          serviceName: web
+          servicePort: 80
