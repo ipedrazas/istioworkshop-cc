@@ -63,7 +63,7 @@ spec:
   precedence: 2
   route:
   - tags:
-      release: v1
+      release: v2
 ```
 
 Test it. Does it work? Should it work? flip your table and grab a beer if not. Buy a beer to your instructor: the night is dark and full of horrors.
