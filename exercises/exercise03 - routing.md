@@ -7,8 +7,32 @@ mkdir chart
 helm create chart/simple 
 helm upgrade --install v1 ./chart/simple --set image.repository=ipedrazas/simple,image.tag=v1,service.externalPort=5000,service.internalPort=5000
 helm upgrade --install v2 ./chart/simple --set image.repository=ipedrazas/simple,image.tag=v2,service.externalPort=5000,service.internalPort=5000
+```
+
+Create the ingress rule
 
 ```
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: simple
+  annotations:
+    kubernetes.io/ingress.class: "istio"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: simple
+          servicePort: 5000
+---
+```
+ submite the ingress rule to the cluster
+ 
+ ```
+ kubectl apply -f ingress.yaml
+ ```
 
 Explain what the following route-rule does:
 
