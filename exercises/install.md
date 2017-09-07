@@ -15,6 +15,8 @@ Th4e chart is located at the following location:
 and it can be installed using the following command:
 
 ```
+helm init
+(wait until tiller is up and running: `kubectl get pods -n kube-system`)
 helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
 helm install incubator/istio
 ```
