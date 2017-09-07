@@ -4,9 +4,9 @@ Deploy two versions of the `simple` microservice, create a service that acces bo
 
 ```
 mkdir chart
-helm create chart/simle 
-helm upgrade --install v1 ./chart/simple --set image.repository=ipedrazas/simple,image.tag=v1
-helm upgrade --install v2 ./chart/simple --set image.repository=ipedrazas/simple,image.tag=v2
+helm create chart/simple 
+helm upgrade --install v1 ./chart/simple --set image.repository=ipedrazas/simple,image.tag=v1,service.externalPort=5000,service.internalPort=5000
+helm upgrade --install v2 ./chart/simple --set image.repository=ipedrazas/simple,image.tag=v2,service.externalPort=5000,service.internalPort=5000
 
 ```
 
